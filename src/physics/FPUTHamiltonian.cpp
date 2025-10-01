@@ -38,7 +38,7 @@ void FPUTHamiltonian::kick(State& s, double dt) {
             r2 += d * d;
         }
         const double r = std::sqrt(r2);
-        const double coeff = k_ + alpha_ * r + beta_ * r2;  // = k + α r + β r^2
+        const double coeff = k_ + alpha_ * r + beta_ * r2;
 
         // Equal & opposite momentum updates
         auto pi = s.p(e.i), pj = s.p(e.j);
