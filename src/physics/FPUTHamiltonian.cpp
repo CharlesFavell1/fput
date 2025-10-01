@@ -26,21 +26,23 @@ void FPUTHamiltonian::drift(State& state, double dt) {
 }
 
 void FPUTHamiltonian::kick(State& s, double dt) {
+    // f_{i,j} = - ( q_i - q_j ) * ( k + alpha * r + beta * r * r )
     const std::size_t D = s.dim();
 
     for (const Edge& e : bonds_->edges()) {
         auto qi = s.q(e.i), qj = s.q(e.j);
 
-        // Δ = q_j - q_i, r = ||Δ||
+        // distance
         double r2 = 0.0;
         for (std::size_t a = 0; a < D; ++a) {
             const double d = qj[a] - qi[a];
             r2 += d * d;
         }
+
         const double r = std::sqrt(r2);
         const double coeff = k_ + alpha_ * r + beta_ * r2;
 
-        // Equal & opposite momentum updates
+        // N dimensional kick
         auto pi = s.p(e.i), pj = s.p(e.j);
         for (std::size_t a = 0; a < D; ++a) {
             const double d = qj[a] - qi[a];

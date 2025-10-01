@@ -16,7 +16,7 @@ class Connectivity {
 public:
     virtual ~Connectivity() = default;
 
-    virtual std::size_t sites() const noexcept = 0;
+    virtual std::size_t           sites() const noexcept = 0;
     virtual std::span<const Edge> edges() const noexcept = 0;
 };
 
