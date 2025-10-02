@@ -57,5 +57,4 @@ void FPUTHamiltonian::kick(State &s, double dt) {
     }
   }
 }
-}
-}
+

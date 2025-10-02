@@ -5,10 +5,11 @@
 #include <algorithm>
 #include <cassert>
 #include <numeric>
+#include <limits>
 #include <span>
 
 State::State(std::size_t N, std::size_t D)
-    : _N(N), _D(D), _ids2idx(N), _idx2ids(N), _q(N * D), _p(N * D) {}
+    : _N(N), _D(D), _ids2idx(N), _free_ids(0), _q(N * D), _p(N * D) {}
 
 void State::initial_condition(std::vector<double> q0, std::vector<double> p0) {
   assert(q0.size() == p0.size() && q0.size() == (_N * _D) &&
@@ -17,12 +18,10 @@ void State::initial_condition(std::vector<double> q0, std::vector<double> p0) {
   _p = std::move(p0);
 
   std::iota(_ids2idx.begin(), _ids2idx.end(), std::size_t{0});
-  std::iota(_idx2ids.begin(), _idx2ids.end(), std::size_t{0});
+
 }
 
 void State::remove(std::span<std::size_t> rows) {
-  // takes a container of the indices to be removed
-  // make decreasing to prevent any cock-ups
   if (rows.empty())
     return;
   std::sort(rows.begin(), rows.end(), std::greater<>{});
@@ -40,7 +39,6 @@ std::size_t State::idx(std::size_t i, std::size_t k) const noexcept {
 std::size_t State::ids2idx(std::size_t id) const noexcept {
   return _ids2idx[id];
 };
-std::size_t State::idx2ids(std::size_t i) const noexcept { return _idx2ids[i]; }
 
 double &State::q(std::size_t i, std::size_t k) noexcept {
   return _q[idx(i, k)];
@@ -70,7 +68,22 @@ std::span<const double> State::p(std::size_t i) const noexcept {
 
 // helper function
 
-void State::_update_mapping(std::size_t idx) {}
+void State::_update_mapping(std::size_t idx) {
+  assert(idx < _N);
+  const std::size_t last = _N - 1;
+  const std::size_t removed_id = _idx2ids[idx];
+  if (idx != last) {
+    const std::size_t last_id = _idx2ids[last];
+    _idx2ids[idx] = last_id;
+    _ids2idx[last_id] = idx; 
+  }
+  _idx2ids.pop_back();                     
+  _ids2idx[removed_id] = std::numeric_limits<std::size_t>::max();
+  _free_ids.push_back(removed_id);      
+  --_N;
+}
+
+
 
 void State::_remove_row(std::size_t idx, std::vector<double> &vec) {
   assert(idx < _N);
