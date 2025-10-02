@@ -9,11 +9,11 @@ class State;
 
 class Hamiltonian {
 public:
-    virtual        ~Hamiltonian() = default;
+  virtual ~Hamiltonian() = default;
 
-    virtual void   drift(State& state, double dt)       = 0;
-    virtual void   kick(State& state, double dt)        = 0;
-    virtual double energy(const State& state) const     = 0;
+  virtual void drift(State &state, double dt) = 0;
+  virtual void kick(State &state, double dt) = 0;
+  virtual double energy(const State &state) const = 0;
 };
 
-#endif //FPUT_HAMILTONIAN_H
+#endif // FPUT_HAMILTONIAN_H
